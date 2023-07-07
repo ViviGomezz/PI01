@@ -7,11 +7,13 @@ app = FastAPI()
 @app.on_event("startup")
 async def startup_event():
     global movies
-    movies = process()
+    movies = pd.read_csv(
+      'https://drive.google.com/uc?id=1o15w2plmoGJrUJhc0QbluyTnY0nSWd6j',
+      sep=',')
     
 @app.get("/idioma")
 async def peliculas_idioma( Idioma : str ):
-    cantidad_idioma = (movies['original_language'] == Idioma).shape[0]
+    cantidad_idioma = (movies['original_language'] == Idioma).sum()
     return f"{cantidad_idioma} cantidad de películas fueron estrenadas en {Idioma}"
     
 @app.get("/duracion")
