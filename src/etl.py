@@ -8,7 +8,7 @@ import datetime
 
 def process():
     print(f"{datetime.datetime.now().strftime('%d/%m/%Y %H:%M:%S')} Init process ETL")
-    movies = pd.read_csv('resources\movies_dataset_corregido.csv', sep=',')
+    movies = pd.read_csv('https://drive.google.com/uc?id=1HLa_PVRE3qkCdZHgfnenPNm9vChmVmKN', sep=',')
 
     movies['belongs_to_collection'] = movies['belongs_to_collection'].apply(lambda x: ast.literal_eval(x) if pd.notnull(x) else None)
     movies2 = pd.json_normalize(movies["belongs_to_collection"])
@@ -36,7 +36,7 @@ def process():
 
     movies.drop(columns=['belongs_to_collection','genres', 'production_countries', 'production_companies'], inplace=True)
 
-    df = pd.read_csv('resources\credits.csv')
+    df = pd.read_csv('https://drive.google.com/uc?id=18mnuOLGk2UGB5NvU4fqxlIP5wc_7tXV2', sep=',')
 
     def get_director_names(director_list):
         crew = ast.literal_eval(director_list)
@@ -75,4 +75,5 @@ def process():
 
     movies = movies.drop(columns=['video','imdb_id','adult','original_title','poster_path', 'homepage'])
     print(f"{datetime.datetime.now().strftime('%d/%m/%Y %H:%M:%S')} End process ETL")
+
     return movies
