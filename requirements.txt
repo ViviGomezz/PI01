@@ -44,7 +44,7 @@ scipy
 six
 sniffio
 stack-data
-starlette
+starlette<0.28.0
 tornado
 traitlets
 typing_extensions
