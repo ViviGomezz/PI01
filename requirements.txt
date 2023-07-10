@@ -18,3 +18,4 @@ uvicorn==0.20.0
 numpy
 pandas
 scikit-learn==1.0.2
+scipy
