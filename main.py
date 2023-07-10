@@ -20,10 +20,10 @@ async def startup_event():
     #se cargan las matrices con los datos estandarizados y con el modelo de recomendacion que creamos, los 
     #cuales podran ser consultados en el repositorio de GitHub
     
-    with open('resources\Recomendation_Model.pkl', "rb") as f:
+    with open('resources/Recomendation_Model.pkl', "rb") as f:
       model = pickle.load(f)
       
-    with open('resources\Movies_Filtered_transf.pkl', "rb") as f:
+    with open('resources/Movies_Filtered_transf.pkl', "rb") as f:
       movies_transform = pickle.load(f)
 
 #se crea la funcion peliculas_idioma, con su respectivo decorador, en donde se filtra el dataset por medio de la columnas
