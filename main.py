@@ -1,10 +1,10 @@
 from fastapi import FastAPI
-from src.etl import process
+from src.recomendation_model import process
 import sklearn
 import pandas as pd
 import pickle
 
-app = FastAPI()
+app = FastAPI(debug=True)
 #se carga el dataset transformado con la informacion de las peliculas
 # se crea la funcion del evento que se ejecuta cuando se inicia por primera vez la API
 
@@ -20,11 +20,7 @@ async def startup_event():
     #se cargan las matrices con los datos estandarizados y con el modelo de recomendacion que creamos, los 
     #cuales podran ser consultados en el repositorio de GitHub
     
-    with open('resources/Recomendation_Model.pkl', "rb") as f:
-      model = pickle.load(f)
-      
-    with open('resources/Movies_Filtered_transf.pkl', "rb") as f:
-      movies_transform = pickle.load(f)
+    movies_transform, model = process(movies)
 
 #se crea la funcion peliculas_idioma, con su respectivo decorador, en donde se filtra el dataset por medio de la columnas
 # 'original_language', y el indioma ingresado por el usuario, y se suma la cantidad de valores encontrados
@@ -70,24 +66,26 @@ async def peliculas_pais( Pais: str ):
 
 #se crea la funcion productoras_exitosas, con su respectivo decorador, en donde se filtra el dataset por medio de la columna
 # 'productor' y el nombre del productor ingresada por el usuario, teniendo en cuenta que la pelicula puede tener varios productores
-# se hace la consulta por medio de un .contains. Se hace una sumatoria del revenue total por productora y 
+# se hace la consulta por medio de una lambda que valida que se encuentre el nombre de la productora, 
+# de lo contrario no devuelve el registro. Se hace una sumatoria del revenue total por productora y 
 # un conteo de la cantidad de peliculas que dicha productora produjo, retornando dichos valores
 
 @app.get("/productoras_exitosas")
 async def productoras_exitosas( Productora: str ):
-  productora= movies[movies['productor'].str.contains(Productora)]
+  productora= movies[movies['productor'].apply(lambda x: Productora in x if isinstance(x, (list, str)) else False)]
   revenue_total = productora['revenue'].sum()
   cantidad_peliculas= productora.shape[0]
   return f"La productora {Productora} ha tenido un revenue de {revenue_total} y {cantidad_peliculas} peliculas"
 
 #se crea la funcion get_director, con su respectivo decorador, en donde se filtra el dataset por medio de la columna
 # 'directors' y el nombre del director ingresado por el usuario, teniendo en cuenta que la pelicula puede tener varios directores
-# se hace la consulta por medio de un .contains. Se hace una sumatoria del return total por director y se retorna
+# se hace la consulta por medio de una lambda que valida que se encuentre el nombre del director, de lo contrario no devuelve el registro,
+# Se hace una sumatoria del return total por director y se retorna
 #un diccionario con la informacion del return y de cada pelicula producida por el director
 
 @app.get("/director")
-async def get_director( nombre_director ): 
-  director= movies[movies['directors'].str.contains(nombre_director)]
+async def get_director(nombre_director): 
+  director= movies[movies['directors'].apply(lambda x: nombre_director in x if isinstance(x, (list, str)) else False)]
   retorno = director['return'].sum()
   exitos = director[['title', 'release_date', 'return', 'budget', 'revenue']]
   return {'retorno_director':retorno,
